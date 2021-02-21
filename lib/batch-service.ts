@@ -8,14 +8,16 @@ import * as targets from "@aws-cdk/aws-events-targets";
 import * as dynamodb from "@aws-cdk/aws-dynamodb";
 import { readFileSync } from "fs";
 import { config } from "dotenv";
+import { Rule } from "@aws-cdk/aws-events";
 
 config();
 
 const functionName = "batch-lambda";
+const eventFunctionName = "event-batch-lambda";
 const firstjobDefinitionName = "job-definition";
 const secondjobDefinitionName = "second-job-definition";
 const computeEnvironmentName = "compute-environment";
-const jobQueueName = "job-queue-gamma-beta";
+const jobQueueName = "job-queue-gamma-onebox";
 const srcPath = `${__dirname}/lambdaHandler.js`;
 
 export class BatchService extends cdk.Stack {
@@ -193,5 +195,22 @@ export class BatchService extends cdk.Stack {
         });
 
         rule.addTarget(new targets.LambdaFunction(lambdaFunction));
+
+        const lambdaFunctionBatchEventHandler = new lambda.Function(this, "event-lambda-function", {
+            functionName: eventFunctionName,
+            code: lambda.Code.fromAsset("resources"),
+            handler: "batch-event-handler.main",
+            runtime: lambda.Runtime.NODEJS_10_X
+        });
+
+
+        const rule1 = new events.Rule(this, "batch-event-rule", {
+            eventPattern: {
+                source: ["aws.batch"]
+            }
+        });
+
+
+        rule1.addTarget(new targets.LambdaFunction(lambdaFunctionBatchEventHandler));
     }
 }

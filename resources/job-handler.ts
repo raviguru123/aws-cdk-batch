@@ -9,17 +9,6 @@ const batch = new Batch({
 exports.main = async (event: any, context: any, callback: any) => {
     try {
         const jobName = `job_${Date.now()}`;
-        // await batch.submitJob({
-        //     jobDefinition: process.env.JOB_DEFINITION,
-        //     jobQueue: process.env.JOB_QUEUE,
-        //     jobName
-        // }, function (err: any, data: any) {
-        //     if (err) {
-        //         console.log("Error occured", err);
-        //     }
-        //     console.log(data);
-        // });
-
 
         const response = await batch.submitJob({
             jobDefinition: process.env.JOB_DEFINITION,
